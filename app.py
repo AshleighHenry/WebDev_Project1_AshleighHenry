@@ -8,25 +8,25 @@ FNAME = "data/scores.pickle"
 
 app = Flask(__name__)
 
-
+# generate random number, start timer and set the number of attempts to 0
 @app.route("/game")
 def generateNumber():
     session["start"] = time.perf_counter()
-    session['randomNum'] = random.randint(0, 100)
+    session['randomNum'] = random.randint(0, 1000)
     session["numOfAttempts"] = 0
     return render_template(
         "game.html",
         the_title="Game", 
-        the_message = "Input a number between 0 - 100"
+        the_message = "Input a number between 0 - 1000"
     )
-
+#check the players guess and update the message
 @app.route("/guessResult", methods=["POST"])
 def guessResult():
-   guess = int(request.form["guess"])
-   randomNumber = session['randomNum']
-   message = ""
+   guess = int(request.form["guess"])   # get the input from the input field
+   randomNumber = session['randomNum']  # get the randomnnumber to check against the guess
+   message = ""     # initialize to set it later
    attempts = session['numOfAttempts']
-   attempts += 1
+   attempts += 1    # increment number of guesses
    session["numOfAttempts"] = attempts
    if guess == randomNumber:
        session["end"] = time.perf_counter() # wont count time as the player inputs their name here
@@ -50,10 +50,11 @@ def guessResult():
        )
    
  
-
+# save the high score of the player
+# if there is no pickle file make a a new one
 @app.route("/recordhighscore", methods=["POST"])
 def store_score():
-    score = round(session["end"] - session["start"], 2)
+    score = round(session["end"] - session["start"], 2) # get the session time
     player_name = request.form["player"]
     attemps = session['numOfAttempts']
     if not os.path.exists(FNAME):
@@ -67,7 +68,7 @@ def store_score():
 
     return "Your highscore has been recorded."
 
-
+# display scores pass them into winners
 @app.route("/highscores")
 def show_scores():
     with open(FNAME, "rb") as pf:
@@ -75,7 +76,7 @@ def show_scores():
     return render_template(
         "winners.html",
         the_title="Here are the High Scores",
-        the_data=sorted(data, reverse=True),
+        the_data=sorted(data, reverse=False), # sort files with lowest time first
     )
 
 
