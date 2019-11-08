@@ -10,17 +10,30 @@ app = Flask(__name__)
 
 @app.route("/game")
 def generateNumber():
-    goal = random.randint(0, 100)
-    score = 0
-    session["score"] = score
-    score = session["score"]
-  
+    session['randomNum'] = random.randint(0, 100)
+    print(session['randomNum'])
+
+
     return render_template(
-        "base.html",
-        the_score=score, the_title="Game", 
+        "game.html",
+        the_title="Game", 
         the_message = "Input a number between 0 - 100"
     )
 
+@app.route("/guessResult", methods=["POST"])
+def guessResult():
+   guess = request.form["guess"]
+   randomNumber = session['randomNum']
+   
+   if guess == randomNumber:
+         return render_template(
+             "score.html",
+              the_score = guess
+               )
+       
+   else:
+       pass
+ 
 
 @app.route("/recordhighscore", methods=["POST"])
 def store_score():
